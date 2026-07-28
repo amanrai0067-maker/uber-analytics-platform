@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+streamlit
+lightgbm
+mlflow
+pandas
+numpy
+plotly
+sqlalchemy
+psycopg2-binary
+pydantic

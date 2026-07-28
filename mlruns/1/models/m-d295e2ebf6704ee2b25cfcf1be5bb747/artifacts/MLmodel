@@ -1,0 +1,27 @@
+artifact_path: file:C:/Users/Aman rai/Desktop/uber-project/mlruns/1/models/m-d295e2ebf6704ee2b25cfcf1be5bb747/artifacts
+flavors:
+  lightgbm:
+    code: null
+    data: model.skops
+    lgb_version: 4.7.0
+    model_class: lightgbm.sklearn.LGBMRegressor
+    serialization_format: skops
+    skops_trusted_types:
+    - lightgbm.sklearn.LGBMRegressor
+    - lightgbm.basic.Booster
+    - collections.OrderedDict
+    - lightgbm.sklearn.LGBMClassifier
+  python_function:
+    data: model.skops
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.lightgbm
+    python_version: 3.14.5
+mlflow_version: 3.14.0
+model_id: m-d295e2ebf6704ee2b25cfcf1be5bb747
+model_size_bytes: 1166166
+model_uuid: m-d295e2ebf6704ee2b25cfcf1be5bb747
+prompts: null
+run_id: 8ab77982830c45ef9bd9f8a81b6946be
+utc_time_created: '2026-07-20 14:45:55.517891'
