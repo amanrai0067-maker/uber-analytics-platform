@@ -1,5 +1,4 @@
 # File: dashboard/app.py
-# File: dashboard/app.py
 import os
 import requests
 import pandas as pd
@@ -13,9 +12,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
+# Render Production API URL
+API_BASE_URL = os.getenv("API_BASE_URL", "https://uber-analytics-platform-2.onrender.com")
 
-# Image-inspired Dark Styling
+# Dark Theme Custom Styling
 st.markdown("""
 <style>
     .stApp { background-color: #0d1117; color: #c9d1d9; }
@@ -29,7 +29,7 @@ st.markdown("""
         padding: 16px;
     }
 
-    /* Tab Custom Styling matching your screenshot */
+    /* Tab Custom Styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 20px;
         border-bottom: 1px solid #30363d;
@@ -50,7 +50,7 @@ st.markdown("""
 @st.cache_data(ttl=30)
 def fetch_api_data(endpoint: str, params: dict = None):
     try:
-        res = requests.get(f"{API_BASE_URL}{endpoint}", params=params, timeout=5)
+        res = requests.get(f"{API_BASE_URL}{endpoint}", params=params, timeout=10)
         return res.json() if res.status_code == 200 else None
     except Exception:
         return None
@@ -64,20 +64,22 @@ forecast_horizon = st.sidebar.slider("Forecast Window (Hours)", 6, 48, 24, 6)
 st.title("🚕 Uber Real-time Analytics & Demand Platform")
 st.markdown("---")
 
-# Executive KPIs
-m1, m2, m3 = st.columns(3)
+# Fetch API Data
 rev_data = fetch_api_data("/revenue/trend", params={"city": city_filter})
 surge_data = fetch_api_data("/surge/analysis", params={"city": city_filter})
 driver_data = fetch_api_data("/drivers/performance", params={"city": city_filter})
 
+# Executive KPIs
+m1, m2, m3 = st.columns(3)
+
 tot_rev = pd.DataFrame(rev_data)["daily_revenue"].sum() if rev_data else 6218151.79
 m1.metric("Total Platform Revenue", f"₹{tot_rev:,.2f}")
 m2.metric("Active Operating Cities", "5")
-m3.metric("System Status", "100% Operational ✅")
+m3.metric("System Status", "100% Operational ✅" if rev_data or surge_data else "Using Offline Demo Data ⚠️")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# 4 Navigation Tabs (Exact match to screenshot)
+# 4 Navigation Tabs
 tab1, tab2, tab3, tab4 = st.tabs([
     "📊 Revenue Trends", 
     "🔥 Hourly Demand & Hotspots", 
@@ -101,7 +103,7 @@ with tab1:
         })
     
     fig_rev = px.line(df_rev, x="date", y="daily_revenue", template=PLOT_TEMPLATE, color_discrete_sequence=["#58a6ff"])
-    st.plotly_chart(fig_rev, width='stretch')
+    st.plotly_chart(fig_rev, use_container_width=True)
 
 # TAB 2: Hourly Demand & Hotspots
 with tab2:
@@ -119,7 +121,7 @@ with tab2:
             df_fc = pd.DataFrame({"timestamp": timestamps, "predicted_demand": mock_demands})
             
         fig_fc = px.line(df_fc, x="timestamp", y="predicted_demand", template=PLOT_TEMPLATE, color_discrete_sequence=["#2ea043"])
-        st.plotly_chart(fig_fc, width='stretch')
+        st.plotly_chart(fig_fc, use_container_width=True)
 
     with col_map:
         st.subheader("Live Pickup Hotspots")
@@ -143,7 +145,7 @@ with tab3:
         size="surge_multiplier", color="surge_multiplier",
         template=PLOT_TEMPLATE, color_continuous_scale="Reds"
     )
-    st.plotly_chart(fig_surge, width='stretch')
+    st.plotly_chart(fig_surge, use_container_width=True)
 
 # TAB 4: Driver Performance
 with tab4:
@@ -156,7 +158,7 @@ with tab4:
     c1, c2 = st.columns(2)
     with c1:
         fig_rating = px.histogram(df_driver, x="rating", nbins=8, template=PLOT_TEMPLATE, title="Rating Distribution", color_discrete_sequence=["#f78166"])
-        st.plotly_chart(fig_rating, width='stretch')
+        st.plotly_chart(fig_rating, use_container_width=True)
     with c2:
         fig_earn = px.box(df_driver, y="earnings", template=PLOT_TEMPLATE, title="Earnings Spread (₹)", color_discrete_sequence=["#a371f7"])
-        st.plotly_chart(fig_earn, width='stretch')
+        st.plotly_chart(fig_earn, use_container_width=True)
